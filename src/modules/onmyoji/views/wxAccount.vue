@@ -1,9 +1,9 @@
 <!--
- * @Description: 阴阳师账号管理 onmyoji_user
+ * @Description: 生锈微信账号管理
  * @Autor: 池樱千幻
  * @Change: 池樱千幻
- * @Date: 2024-03-19 23:31:58
- * @LastEditTime: 2024-03-20 13:05:30
+ * @Date: 2024-03-20 17:15:24
+ * @LastEditTime: 2024-03-20 17:16:02
 -->
 <template>
   <cl-crud ref="Crud">
@@ -43,48 +43,18 @@ const { service } = useCool();
 
 // cl-upsert
 const Upsert = useUpsert({
-  items: [{
-    prop: "userId",
-    label: "账号",
-    span: 12,
-    required: true,
-    component: {
-      name: "el-input"
-    }
-  },
-  {
-    prop: "username",
-    label: "用户名",
-    span: 12,
-    required: true,
-    component: {
-      name: "el-input"
-    }
-  },]
+  items: []
 });
 
 // cl-table
 const Table = useTable({
-  columns: [{
-    type: "selection",
-    width: 60
-  },
-  {
-    prop: "userId",
-    label: "账号",
-    minWidth: 150
-  },
-  {
-    prop: "username",
-    label: "用户名",
-    minWidth: 120
-  },]
+  columns: []
 });
 
 // cl-crud
 const Crud = useCrud(
   {
-    service: service.base.onmyoji.user
+    service: service.demo.goods
   },
   (app) => {
     app.refresh();
