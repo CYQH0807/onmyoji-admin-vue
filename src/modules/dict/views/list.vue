@@ -26,8 +26,9 @@
 								type="success"
 								v-permission="service.dict.info.permission.add"
 								@click="append(scope.row)"
-								>新增</el-button
 							>
+								新增
+							</el-button>
 						</template>
 					</cl-table>
 				</cl-row>
@@ -49,6 +50,7 @@
 							/>
 
 							<div class="op">
+								// eslint-disable-next-line prettier/prettier
 								<cl-upload-space
 									text="使用文件"
 									:limit="1"

@@ -19,8 +19,8 @@ module.exports = {
 	extends: [
 		"plugin:vue/vue3-recommended",
 		"plugin:@typescript-eslint/recommended",
-		"plugin:prettier/recommended",
-		"@vue/airbnb"
+		"prettier",
+		"plugin:prettier/recommended"
 	],
 	rules: {
 		"@typescript-eslint/ban-ts-ignore": "off",
