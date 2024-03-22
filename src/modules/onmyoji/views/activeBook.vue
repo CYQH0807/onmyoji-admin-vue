@@ -1,6 +1,6 @@
 <template>
 	<cl-view-group ref="ViewGroup">
-		<template #item-name="{ item }"> {{ item.name }} - {{ item.key }} </template>
+		<template #item-name="{ item }"> {{ item.activeName }} - {{ item.activeDesc }} </template>
 
 		<template #right>
 			<cl-crud ref="Crud">
@@ -68,22 +68,23 @@
 <script lang="ts" name="dict-list" setup>
 import { setFocus, useCrud, useTable, useUpsert } from "@cool-vue/crud";
 import { useCool } from "/@/cool";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { deepTree } from "/@/cool/utils";
 import { cloneDeep } from "lodash-es";
 import { useDict } from "../../dict";
 import { useViewGroup } from "/@/plugins/view";
 
 const { service } = useCool();
+console.log("service: ", service);
 const { dict } = useDict();
 
 const { ViewGroup } = useViewGroup({
 	label: "类型",
 	title: "字典列表",
-	service: service.dict.type,
+	service: service.base.onmyoji.active,
 	onSelect(item) {
 		refresh({
-			typeId: item.id,
+			activeId: item.activeId,
 			page: 1
 		});
 	},
@@ -204,6 +205,38 @@ const Upsert = useUpsert({
 	plugins: [setFocus("name")]
 });
 
+let columns: List<ClTable.Column<any>> = [
+	{
+		type: "selection"
+	},
+	{ label: "名称", prop: "name", align: "left", minWidth: 200 },
+	{ label: "ID", prop: "id", minWidth: 120 },
+	{ label: `值`, prop: "value", minWidth: 200, showOverflowTooltip: true },
+	{ label: "备注", prop: "remark", showOverflowTooltip: true, minWidth: 160 },
+	{ label: "创建时间", prop: "createTime", sortable: "custom", minWidth: 160 },
+	{ label: "更新时间", prop: "updateTime", sortable: "custom", minWidth: 160 },
+	{
+		type: "op",
+		width: 250,
+		buttons: ["slot-btn", "edit", "delete"]
+	}
+];
+
+let columns1: List<ClTable.Column<any>> = [
+	{
+		type: "selection"
+	},
+	{ label: "名称", prop: "name", align: "left", minWidth: 200 },
+	{ label: "ID", prop: "id", minWidth: 120 },
+	{ label: `值`, prop: "value", minWidth: 200, showOverflowTooltip: true },
+	{ label: "备注", prop: "remark", showOverflowTooltip: true, minWidth: 160 },
+	{
+		type: "op",
+		width: 250,
+		buttons: ["slot-btn", "edit", "delete"]
+	}
+];
+
 // cl-table
 const Table = useTable({
 	contextMenu: [
@@ -223,48 +256,39 @@ const Table = useTable({
 		"order-asc",
 		"order-desc"
 	],
-	columns: [
-		{
-			type: "selection"
-		},
-		{ label: "名称", prop: "name", align: "left", minWidth: 200 },
-		{ label: "ID", prop: "id", minWidth: 120 },
-		{ label: "值", prop: "value", minWidth: 200, showOverflowTooltip: true },
-		{ label: "备注", prop: "remark", showOverflowTooltip: true, minWidth: 160 },
-		{ label: "排序", prop: "orderNum", sortable: "desc", width: 100, fixed: "right" },
-		{ label: "创建时间", prop: "createTime", sortable: "custom", minWidth: 160 },
-		{ label: "更新时间", prop: "updateTime", sortable: "custom", minWidth: 160 },
-		{
-			type: "op",
-			width: 250,
-			buttons: ["slot-btn", "edit", "delete"]
-		}
-	]
+	columns: columns
 });
 
 // cl-crud
 const Crud = useCrud({
-	service: service.dict.info,
-	onRefresh(params, { render }) {
-		service.dict.info
-			.list({
-				...params,
-				page: undefined,
-				size: undefined
-			})
-			.then((res) => {
-				// 渲染数据
-				render(deepTree(res, params.sort));
-
-				// 刷新字典
-				dict.refresh([ViewGroup.value?.selected?.key]);
-			});
-	}
+	service: service.base.onmyoji.activeBooks
+	// onRefresh(params, { render }) {
+	// 	service.base.onmyoji.activeBooks
+	// 		.list({
+	// 			...params,
+	// 			page: undefined,
+	// 			size: undefined
+	// 		})
+	// 		.then((res) => {
+	// 			// 渲染数据
+	// 			render(deepTree(res, params.sort));
+	// 		});
+	// }
 });
 
+let i = 0;
 // 刷新
 function refresh(params?: any) {
+	console.log(i);
+	console.log("params: ", params);
 	Crud.value?.refresh(params);
+	console.log("Crud.value: ", Table.value?.columns);
+	if (i > 3) {
+		columns = columns1;
+		console.log(3);
+	}
+
+	i++;
 }
 
 // 行点击展开
