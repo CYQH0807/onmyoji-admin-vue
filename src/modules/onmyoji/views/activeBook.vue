@@ -92,12 +92,12 @@ const { ViewGroup } = useViewGroup({
 		return {
 			width: "500px",
 			props: {
-				labelWidth: "60px"
+				// labelWidth: "60px"
 			},
 			items: [
 				{
 					label: "名称",
-					prop: "name",
+					prop: "activeName",
 					component: {
 						name: "el-input",
 						props: {
@@ -107,13 +107,31 @@ const { ViewGroup } = useViewGroup({
 					required: true
 				},
 				{
-					label: "Key",
-					prop: "key",
+					label: "描述",
+					prop: "activeDesc",
 					component: {
 						name: "el-input",
 						props: {
 							maxlength: 20
 						}
+					},
+					required: true
+				},
+				{
+					label: "开始时间",
+					prop: "activeBeginDate",
+					component: {
+						name: "el-date-picker",
+						placeholder: "请选择开始时间"
+					},
+					required: true
+				},
+				{
+					label: "结束时间",
+					prop: "activeEndDate",
+					component: {
+						name: "el-date-picker",
+						placeholder: "请选择结束时间"
 					},
 					required: true
 				}
@@ -205,35 +223,19 @@ const Upsert = useUpsert({
 	plugins: [setFocus("name")]
 });
 
+// 表格基础列
 let columns: List<ClTable.Column<any>> = [
 	{
 		type: "selection"
 	},
-	{ label: "名称", prop: "name", align: "left", minWidth: 200 },
-	{ label: "ID", prop: "id", minWidth: 120 },
-	{ label: `值`, prop: "value", minWidth: 200, showOverflowTooltip: true },
-	{ label: "备注", prop: "remark", showOverflowTooltip: true, minWidth: 160 },
-	{ label: "创建时间", prop: "createTime", sortable: "custom", minWidth: 160 },
-	{ label: "更新时间", prop: "updateTime", sortable: "custom", minWidth: 160 },
 	{
-		type: "op",
-		width: 250,
-		buttons: ["slot-btn", "edit", "delete"]
-	}
-];
-
-let columns1: List<ClTable.Column<any>> = [
-	{
-		type: "selection"
-	},
-	{ label: "名称", prop: "name", align: "left", minWidth: 200 },
-	{ label: "ID", prop: "id", minWidth: 120 },
-	{ label: `值`, prop: "value", minWidth: 200, showOverflowTooltip: true },
-	{ label: "备注", prop: "remark", showOverflowTooltip: true, minWidth: 160 },
-	{
-		type: "op",
-		width: 250,
-		buttons: ["slot-btn", "edit", "delete"]
+		label: "账号",
+		prop: "userId",
+		align: "left",
+		minWidth: 200,
+		formatter: (row) => {
+			return `${row.username}(${row.userId})`;
+		}
 	}
 ];
 
@@ -276,19 +278,33 @@ const Crud = useCrud({
 	// }
 });
 
-let i = 0;
 // 刷新
-function refresh(params?: any) {
-	console.log(i);
-	console.log("params: ", params);
-	Crud.value?.refresh(params);
-	console.log("Crud.value: ", Table.value?.columns);
-	if (i > 3) {
-		columns = columns1;
-		console.log(3);
+async function refresh(params?: any) {
+	// 先请求活动项的内容
+	let list = await service.base.onmyoji.activeItem.list({
+		activeId: params.activeId
+	});
+	// 根据活动项构建动态表格列
+
+	let cur_columns = cloneDeep(columns);
+	list.forEach((item) => {
+		cur_columns.push({
+			label: item.activeItemName,
+			prop: `prop${item.activeItemId}`,
+			minWidth: 200
+		});
+	});
+	cur_columns.push({
+		type: "op",
+		width: 250,
+		buttons: ["slot-btn", "edit", "delete"]
+	});
+
+	if (Table.value) {
+		Table.value.columns = cur_columns as any;
 	}
 
-	i++;
+	Crud.value?.refresh(params);
 }
 
 // 行点击展开
