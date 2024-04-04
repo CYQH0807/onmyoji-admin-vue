@@ -1,78 +1,85 @@
 <template>
-	<cl-view-group ref="ViewGroup">
-		<template #item-name="{ item }"> {{ item.activeName }} - {{ item.activeDesc }} </template>
+	<div class="content">
+		<cl-view-group ref="ViewGroup">
+			<template #item-name="{ item }">
+				{{ item.activeName }} - {{ item.activeDesc }}
+			</template>
 
-		<template #right>
-			<cl-crud ref="Crud">
-				<cl-row>
-					<!-- 刷新按钮 -->
-					<cl-refresh-btn />
-					<!-- 新增按钮 -->
-					<cl-add-btn />
-					<!-- 批量删除 -->
-					<cl-multi-delete-btn />
-					<cl-flex1 />
-					<!-- 关键字搜索 -->
-					<cl-search-key placeholder="搜索名称" />
-				</cl-row>
+			<template #right>
+				<cl-crud ref="Crud">
+					<cl-row>
+						<!-- 刷新按钮 -->
+						<cl-refresh-btn />
 
-				<cl-row>
-					<!-- 数据表格 -->
-					<cl-table ref="Table" row-key="id" @row-click="onRowClick">
-						<template #slot-btn="{ scope }">
-							<el-button
-								text
-								bg
-								type="success"
-								v-permission="service.dict.info.permission.add"
-								@click="append(scope.row)"
-							>
-								新增
-							</el-button>
-						</template>
-					</cl-table>
-				</cl-row>
+						<el-button type="primary" @click="activeItemDialogVisible = true"
+							>编辑活动项</el-button
+						>
 
-				<cl-row>
-					<cl-flex1 />
-				</cl-row>
+						<cl-flex1 />
+						<!-- 关键字搜索 -->
+						<cl-search-key placeholder="搜索账号" />
+					</cl-row>
 
-				<!-- 新增、编辑 -->
-				<cl-upsert ref="Upsert">
-					<template #slot-value="{ scope }">
-						<div class="form-value">
-							<el-input
-								v-model="scope.value"
-								placeholder="请填写值"
-								clearable
-								type="textarea"
-								:rows="4"
-							/>
+					<cl-row>
+						<!-- 数据表格 -->
+						<cl-table ref="Table" row-key="id"> </cl-table>
+					</cl-row>
 
-							<div class="op">
-								// eslint-disable-next-line prettier/prettier
-								<cl-upload-space
-									text="使用文件"
-									:limit="1"
-									@confirm="onFileConfirm"
+					<cl-row>
+						<cl-flex1 />
+					</cl-row>
+
+					<!-- 新增、编辑 -->
+					<cl-upsert ref="Upsert">
+						<template #slot-value="{ scope }">
+							<div class="form-value">
+								<el-input
+									v-model="scope.value"
+									placeholder="请填写值"
+									clearable
+									type="textarea"
+									:rows="4"
 								/>
+
+								<div class="op">
+									// eslint-disable-next-line prettier/prettier
+									<cl-upload-space
+										text="使用文件"
+										:limit="1"
+										@confirm="onFileConfirm"
+									/>
+								</div>
 							</div>
-						</div>
-					</template>
-				</cl-upsert>
-			</cl-crud>
-		</template>
-	</cl-view-group>
+						</template>
+					</cl-upsert>
+				</cl-crud>
+			</template>
+		</cl-view-group>
+
+		<cl-dialog
+			title="活动项"
+			width="80%"
+			v-model="activeItemDialogVisible"
+			:before-close="beforeClose"
+		>
+			<onmyoji-active-item :activeId="curActiveId"></onmyoji-active-item>
+		</cl-dialog>
+	</div>
 </template>
 
 <script lang="ts" name="dict-list" setup>
-import { setFocus, useCrud, useTable, useUpsert } from "@cool-vue/crud";
+import { setFocus, useCrud, useTable, useUpsert, useForm } from "@cool-vue/crud";
+import onmyojiActiveItem from "./activeItem.vue";
 import { useCool } from "/@/cool";
-import { computed, ref } from "vue";
+import { Ref, computed, ref } from "vue";
 import { deepTree } from "/@/cool/utils";
 import { cloneDeep } from "lodash-es";
 import { useDict } from "../../dict";
 import { useViewGroup } from "/@/plugins/view";
+
+let curItemList: Eps.BaseOnmyojiActiveItemEntity[] = [];
+let curActiveId = ref("");
+const activeItemDialogVisible = ref(false);
 
 const { service } = useCool();
 console.log("service: ", service);
@@ -80,9 +87,10 @@ const { dict } = useDict();
 
 const { ViewGroup } = useViewGroup({
 	label: "类型",
-	title: "字典列表",
+	title: "记录",
 	service: service.base.onmyoji.active,
 	onSelect(item) {
+		item.name = item.activeName;
 		refresh({
 			activeId: item.activeId,
 			page: 1
@@ -264,30 +272,30 @@ const Table = useTable({
 // cl-crud
 const Crud = useCrud({
 	service: service.base.onmyoji.activeBooks
-	// onRefresh(params, { render }) {
-	// 	service.base.onmyoji.activeBooks
-	// 		.list({
-	// 			...params,
-	// 			page: undefined,
-	// 			size: undefined
-	// 		})
-	// 		.then((res) => {
-	// 			// 渲染数据
-	// 			render(deepTree(res, params.sort));
-	// 		});
-	// }
 });
+
+function beforeClose(done) {
+	// 弹窗关闭前,刷新表格
+
+	refresh({
+		activeId: curActiveId.value
+	}).then(() => {
+		done();
+	});
+}
 
 // 刷新
 async function refresh(params?: any) {
+	console.log("params: ", params);
 	// 先请求活动项的内容
-	let list = await service.base.onmyoji.activeItem.list({
+	curItemList = await service.base.onmyoji.activeItem.list({
 		activeId: params.activeId
 	});
-	// 根据活动项构建动态表格列
+	curActiveId.value = params.activeId;
 
+	// 根据活动项构建动态表格列
 	let cur_columns = cloneDeep(columns);
-	list.forEach((item) => {
+	curItemList.forEach((item) => {
 		cur_columns.push({
 			label: item.activeItemName,
 			prop: `prop${item.activeItemId}`,
@@ -296,22 +304,17 @@ async function refresh(params?: any) {
 	});
 	cur_columns.push({
 		type: "op",
-		width: 250,
-		buttons: ["slot-btn", "edit", "delete"]
+		width: 80,
+		buttons: ["edit"]
 	});
 
 	if (Table.value) {
 		Table.value.columns = cur_columns as any;
 	}
 
-	Crud.value?.refresh(params);
-}
+	// 根据活动项,构建编辑活动框
 
-// 行点击展开
-function onRowClick(row: any, column: any) {
-	if (column?.property && row.children) {
-		Table.value?.toggleRowExpansion(row);
-	}
+	Crud.value?.refresh(params);
 }
 
 // 追加子集
@@ -333,5 +336,9 @@ function onFileConfirm(selection: any[]) {
 	.op {
 		margin-top: 10px;
 	}
+}
+
+.content {
+	height: 100%;
 }
 </style>
