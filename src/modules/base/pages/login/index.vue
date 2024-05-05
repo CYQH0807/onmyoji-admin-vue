@@ -68,7 +68,7 @@
 			<cl-svg name="bg"></cl-svg>
 		</div>
 
-		<a href="https://cool-js.com" class="copyright"> Copyright © COOL </a>
+		<a href="https://cool-js.com" class="copyright"> Copyright © 池樱千幻 </a>
 	</div>
 </template>
 

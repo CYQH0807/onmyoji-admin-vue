@@ -1,5 +1,5 @@
 {
-	"name": "cool-admin",
+	"name": "onmyoji-admin",
 	"version": "7.1.0",
 	"scripts": {
 		"dev": "vite --host",
