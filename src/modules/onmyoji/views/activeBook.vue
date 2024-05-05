@@ -22,7 +22,24 @@
 
 					<cl-row>
 						<!-- 数据表格 -->
-						<cl-table ref="Table" row-key="id"> </cl-table>
+						<cl-table ref="Table" row-key="id">
+							<template
+								v-for="(item, index) in curItemList"
+								:key="index"
+								#[`column-prop${item.activeItemId}`]="{ scope }"
+							>
+								<component
+									:is="item.activeItemType"
+									v-model="scope.row[`prop${item.activeItemId}`]"
+									true-value="1"
+									false-value="0"
+									@change="(val) => componentChange(val, item, scope.row)"
+								/>
+								<!-- type:{{ item.activeItemType }}
+
+								具体值: {{ scope.row[`prop${item.activeItemId}`] }} -->
+							</template>
+						</cl-table>
 					</cl-row>
 
 					<cl-row>
@@ -77,7 +94,7 @@ import { cloneDeep } from "lodash-es";
 import { useDict } from "../../dict";
 import { useViewGroup } from "/@/plugins/view";
 
-let curItemList: Eps.BaseOnmyojiActiveItemEntity[] = [];
+let curItemList: Ref<Eps.BaseOnmyojiActiveItemEntity[]> = ref([]);
 let curActiveId = ref("");
 const activeItemDialogVisible = ref(false);
 
@@ -274,9 +291,17 @@ const Crud = useCrud({
 	service: service.base.onmyoji.activeBooks
 });
 
+async function componentChange(val: any, item: any, row: any) {
+	await service.base.onmyoji.acitveUserItem.updateUserItem({
+		activeItemId: item.activeItemId,
+		userId: row.userId,
+		activeId: row.activeId,
+		value: val
+	});
+}
+
 function beforeClose(done) {
 	// 弹窗关闭前,刷新表格
-
 	refresh({
 		activeId: curActiveId.value
 	}).then(() => {
@@ -288,14 +313,15 @@ function beforeClose(done) {
 async function refresh(params?: any) {
 	console.log("params: ", params);
 	// 先请求活动项的内容
-	curItemList = await service.base.onmyoji.activeItem.list({
+	curItemList.value = await service.base.onmyoji.activeItem.list({
 		activeId: params.activeId
 	});
+	console.log(curItemList.value);
 	curActiveId.value = params.activeId;
 
 	// 根据活动项构建动态表格列
 	let cur_columns = cloneDeep(columns);
-	curItemList.forEach((item) => {
+	curItemList.value.forEach((item) => {
 		cur_columns.push({
 			label: item.activeItemName,
 			prop: `prop${item.activeItemId}`,
