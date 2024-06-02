@@ -28,7 +28,7 @@
 		"monaco-editor": "0.36.0",
 		"nprogress": "^0.2.0",
 		"pinia": "^2.1.7",
-		"socket.io-client": "^4.7.2",
+		"socket.io-client": "^4.7.4",
 		"store": "^2.0.12",
 		"vue": "^3.4.15",
 		"vue-echarts": "^6.6.1",
