@@ -3,8 +3,9 @@
 		<h2>{{ id }}</h2>
 		<div>
 			<div v-for="(item, index) in msgList" :key="index">
-				<span>{{ item.id }} 说: </span>
-				<span>{{ item.msg }}</span>
+				<span>{{ item.sendUserName }} 说: </span>
+				<span>{{ item.message }}</span>
+				<span>{{ item.sendTime }}</span>
 			</div>
 		</div>
 		<div>
@@ -31,7 +32,7 @@ const { user } = useBase();
 
 let msgList = ref<any[]>([]);
 let msg = ref<string>("");
-let id = ref<string>("");
+let roomId = ref<string>("");
 
 console.log("user.info: ", user.info);
 
@@ -41,15 +42,15 @@ const socket = io(
 
 socket.on("data", (msg) => {
 	console.log("服务端消息", msg);
-	switch (msg.type) {
+	switch (msg.messageType) {
 		case "connect":
-			id.value = msg.data.id;
-			msgList.value = msg.data.hisMsgList;
+			roomId.value = msg.roomId;
+			// msgList.value = msg.data.hisMsgList;
 
 			ElMessage.success("连接成功");
 			break;
-		case "message":
-			msgList.value.push(msg.data);
+		case "text":
+			msgList.value.push(msg);
 			break;
 		default:
 			break;
@@ -57,8 +58,8 @@ socket.on("data", (msg) => {
 });
 
 function send(e) {
-	socket.emit("sendMsg", { id: id.value, msg: msg.value });
-	msgList.value.push({ id: "我", msg: msg.value });
+	socket.emit("sendMsg", { userId: user.info?.id, msg: msg.value });
+	// msgList.value.push({ id: "我", msg: msg.value });
 	msg.value = "";
 	e.preventDefault();
 	return false;
