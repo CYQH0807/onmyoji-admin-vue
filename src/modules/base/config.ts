@@ -19,6 +19,10 @@ export default (): ModuleConfig => {
 				component: () => import("./views/info.vue")
 			}
 		],
+		toolbar: {
+			order: 2,
+			component: import("./components/rrwebRecord/index.vue")
+		},
 		pages: [
 			{
 				path: "/login",
