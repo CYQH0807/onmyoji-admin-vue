@@ -24,15 +24,17 @@ const routes: RouteRecordRaw[] = [
 		path: "/:catchAll(.*)",
 		name: "404",
 		component: () => import("/$/base/pages/error/404.vue")
+	},
+	{
+		path: "/AiChat",
+		name: "chat",
+		component: () => import("/$/base/pages/chat/index.vue")
 	}
 ];
 
 // 创建路由器
 const router = createRouter({
-	history:
-		config.app.router.mode == "history"
-			? createWebHistory(baseUrl)
-			: createWebHashHistory(baseUrl),
+	history: config.app.router.mode == "history" ? createWebHistory(baseUrl) : createWebHashHistory(baseUrl),
 	routes
 }) as Router;
 

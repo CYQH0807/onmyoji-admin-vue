@@ -12,12 +12,7 @@ export const useUserStore = defineStore("user", function () {
 	const token = ref<string>(config.test.token || data.token);
 
 	// 设置标识
-	function setToken(data: {
-		token: string;
-		expire: number;
-		refreshToken: string;
-		refreshExpire: number;
-	}) {
+	function setToken(data: { token: string; expire: number; refreshToken: string; refreshExpire: number }) {
 		// 请求的唯一标识
 		token.value = data.token;
 		storage.set("token", data.token, data.expire);

@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import { bootstrap } from "./cool";
+import "uno.css";
 
 const app = createApp(App);
 

@@ -7,18 +7,7 @@
 		</el-badge>
 
 		<!-- 弹框 -->
-		<cl-dialog
-			v-model="visible"
-			title="聊天窗口"
-			height="70vh"
-			width="1200px"
-			padding="0"
-			keep-alive
-			:scrollbar="false"
-			:close-on-click-modal="false"
-			close-on-press-escape
-			:controls="['slot-expand', 'cl-flex1', 'fullscreen', 'close']"
-		>
+		<cl-dialog v-model="visible" title="聊天窗口" height="70vh" width="1200px" padding="0" keep-alive :scrollbar="false" :close-on-click-modal="false" close-on-press-escape :controls="['slot-expand', 'cl-flex1', 'fullscreen', 'close']">
 			<div
 				class="cl-chat"
 				:class="{

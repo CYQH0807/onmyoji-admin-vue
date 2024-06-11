@@ -43,12 +43,7 @@
 
 								<!-- 图片 -->
 								<div class="is-image" v-else-if="item.contentType == 1">
-									<el-image
-										:src="item.content.imageUrl"
-										:preview-src-list="previewUrls"
-										:initial-index="item._index"
-										scroll-container=".chat-message .list"
-									/>
+									<el-image :src="item.content.imageUrl" :initial-index="item._index" scroll-container=".chat-message .list" />
 								</div>
 							</div>
 						</div>

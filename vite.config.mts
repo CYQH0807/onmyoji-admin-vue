@@ -15,6 +15,9 @@ function isDev(mode: string | undefined): boolean {
 	return mode === "development";
 }
 
+import Unocss from "unocss/vite";
+import { presetAttributify, presetIcons, presetUno, transformerDirectives, transformerVariantGroup } from "unocss";
+
 // https://vitejs.dev/config
 export default ({ mode }: ConfigEnv): UserConfig => {
 	return {
@@ -27,6 +30,19 @@ export default ({ mode }: ConfigEnv): UserConfig => {
 				open: false,
 				gzipSize: true,
 				brotliSize: true
+			}),
+			// https://github.com/antfu/unocss
+			// see unocss.config.ts for config
+			Unocss({
+				presets: [
+					presetUno(),
+					presetAttributify(),
+					presetIcons({
+						scale: 1.2,
+						warn: true
+					})
+				],
+				transformers: [transformerDirectives(), transformerVariantGroup()]
 			})
 		],
 		base: "/",
