@@ -15,11 +15,37 @@ function isDev(mode: string | undefined): boolean {
 	return mode === "development";
 }
 
+function isLib(mode: string | undefined): boolean {
+	return mode === "lib";
+}
+
 import Unocss from "unocss/vite";
 import { presetAttributify, presetIcons, presetUno, transformerDirectives, transformerVariantGroup } from "unocss";
 
 // https://vitejs.dev/config
 export default ({ mode }: ConfigEnv): UserConfig => {
+	console.log("mode: ", mode);
+	const libBuild = {
+		target: "esnext",
+		cssCodeSplit: true,
+		lib: {
+			entry: "./lib/main.ts",
+			name: "my-test",
+			fileName: "my-test"
+		},
+		external: [],
+		rollupOptions: {
+			plugins: [visualizer()],
+			external: [],
+			input: {
+				main: "./lib/main.ts"
+			},
+			output: {
+				dir: "distLib"
+			}
+		}
+	};
+
 	return {
 		plugins: [
 			vue(),
@@ -71,35 +97,31 @@ export default ({ mode }: ConfigEnv): UserConfig => {
 		esbuild: {
 			drop: isDev(mode) ? [] : ["console", "debugger"]
 		},
-		build: {
-			minify: "esbuild",
-			// terserOptions: {
-			// 	compress: {
-			// 		drop_console: true,
-			// 		drop_debugger: true
-			// 	}
-			// },
-			sourcemap: isDev(mode),
-			rollupOptions: {
-				output: {
-					chunkFileNames: "static/js/[name]-[hash].js",
-					entryFileNames: "static/js/[name]-[hash].js",
-					assetFileNames: "static/[ext]/[name]-[hash].[ext]",
-					manualChunks(id) {
-						if (id.includes("node_modules")) {
-							if (!["@cool-vue/crud"].find((e) => id.includes(e))) {
-								let str = id.toString().split("node_modules/")[1];
+		build: isLib(mode)
+			? libBuild
+			: {
+					minify: "esbuild",
+					sourcemap: isDev(mode),
+					rollupOptions: {
+						output: {
+							chunkFileNames: "static/js/[name]-[hash].js",
+							entryFileNames: "static/js/[name]-[hash].js",
+							assetFileNames: "static/[ext]/[name]-[hash].[ext]",
+							manualChunks(id) {
+								if (id.includes("node_modules")) {
+									if (!["@cool-vue/crud"].find((e) => id.includes(e))) {
+										let str = id.toString().split("node_modules/")[1];
 
-								if (str[0] == "@") {
-									str = str.replace("/", ".");
+										if (str[0] == "@") {
+											str = str.replace("/", ".");
+										}
+
+										return str.split("/")[0].toString();
+									}
 								}
-
-								return str.split("/")[0].toString();
 							}
 						}
 					}
 				}
-			}
-		}
 	};
 };

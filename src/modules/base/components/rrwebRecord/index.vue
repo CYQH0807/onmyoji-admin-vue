@@ -1,6 +1,6 @@
 <template>
 	<el-badge is-dot>
-		<div class="btn" @click="toggle">
+		<div id="textaaa" class="btn" @click="toggle">
 			<span>{{ btnText }}</span>
 		</div>
 	</el-badge>

@@ -3,6 +3,7 @@
   "version": "7.1.0",
   "scripts": {
     "dev": "vite --host",
+    "lib": "vite build --mode lib",
     "build": "vite build",
     "serve": "vite preview",
     "lint:prettier": "prettier --write --loglevel warn \"src/**/*.{js,json,tsx,css,less,scss,vue,html,md}\"",
