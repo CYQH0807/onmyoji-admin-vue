@@ -14,8 +14,7 @@ import { onMounted, onUnmounted, ref } from "vue";
 import { getReplayConsolePlugin } from "@saola.ai/rrweb-plugin-console-replay";
 import rrwebPlayer from "rrweb-player";
 import "rrweb-player/dist/style.css";
-let events = JSON.parse(localStorage.getItem("rrweb-events") || "[]");
-console.log("events: ", events);
+let events = [];
 let replayer: any;
 function begin() {
 	if (events.length > 0) {
@@ -23,19 +22,28 @@ function begin() {
 			target: document.getElementById("rrwebPlayer"), // 可以自定义 DOM 元素
 			// 配置项
 			props: {
-				events
-			},
-			plugins: [
-				getReplayConsolePlugin({
-					level: ["info", "log", "warn", "error"]
-				})
-			]
+				events,
+				plugins: [
+					getReplayConsolePlugin({
+						level: ["info", "log", "warn", "error"]
+						// 通过插件获取到的 console 信息会以 console.log 的形式输出到控制台
+						// 你也可以通过插件获取到的 console 信息，通过自定义的插件输出到其他地方
+						// 例如：将 console 信息输出到自定义的 DOM 元素中
+						// replayLogger: {
+						// 	log: (msg: LogData) => {
+						// 		console.log("msg: ", msg);
+						// 	}
+						// }
+					})
+				]
+			}
 		});
 	}
 }
 
 import { genFileId } from "element-plus";
 import type { UploadInstance, UploadProps, UploadRawFile, UploadRequestOptions } from "element-plus";
+import { LogData } from "rrweb";
 
 const upload = ref<UploadInstance>();
 
