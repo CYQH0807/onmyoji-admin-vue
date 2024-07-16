@@ -1,9 +1,7 @@
 <template>
 	<div class="content">
 		<cl-view-group ref="ViewGroup">
-			<template #item-name="{ item }">
-				{{ item.activeName }} - {{ item.activeDesc }}
-			</template>
+			<template #item-name="{ item }"> {{ item.activeName }} - {{ item.activeDesc }} </template>
 
 			<template #right>
 				<cl-crud ref="Crud">
@@ -11,9 +9,7 @@
 						<!-- 刷新按钮 -->
 						<cl-refresh-btn />
 
-						<el-button type="primary" @click="activeItemDialogVisible = true"
-							>编辑活动项</el-button
-						>
+						<el-button type="primary" @click="activeItemDialogVisible = true">编辑活动项</el-button>
 
 						<cl-flex1 />
 						<!-- 关键字搜索 -->
@@ -23,18 +19,8 @@
 					<cl-row>
 						<!-- 数据表格 -->
 						<cl-table ref="Table" row-key="id">
-							<template
-								v-for="(item, index) in curItemList"
-								:key="index"
-								#[`column-prop${item.activeItemId}`]="{ scope }"
-							>
-								<component
-									:is="item.activeItemType"
-									v-model="scope.row[`prop${item.activeItemId}`]"
-									true-value="1"
-									false-value="0"
-									@change="(val) => componentChange(val, item, scope.row)"
-								/>
+							<template v-for="(item, index) in curItemList" :key="index" #[`column-prop${item.activeItemId}`]="{ scope }">
+								<component :is="item.activeItemType" v-model="scope.row[`prop${item.activeItemId}`]" true-value="1" false-value="0" @change="(val) => componentChange(val, item, scope.row)" />
 								<!-- type:{{ item.activeItemType }}
 
 								具体值: {{ scope.row[`prop${item.activeItemId}`] }} -->
@@ -50,21 +36,11 @@
 					<cl-upsert ref="Upsert">
 						<template #slot-value="{ scope }">
 							<div class="form-value">
-								<el-input
-									v-model="scope.value"
-									placeholder="请填写值"
-									clearable
-									type="textarea"
-									:rows="4"
-								/>
+								<el-input v-model="scope.value" placeholder="请填写值" clearable type="textarea" :rows="4" />
 
 								<div class="op">
 									// eslint-disable-next-line prettier/prettier
-									<cl-upload-space
-										text="使用文件"
-										:limit="1"
-										@confirm="onFileConfirm"
-									/>
+									<cl-upload-space text="使用文件" :limit="1" @confirm="onFileConfirm" />
 								</div>
 							</div>
 						</template>
@@ -73,12 +49,7 @@
 			</template>
 		</cl-view-group>
 
-		<cl-dialog
-			title="活动项"
-			width="80%"
-			v-model="activeItemDialogVisible"
-			:before-close="beforeClose"
-		>
+		<cl-dialog title="活动项" width="80%" v-model="activeItemDialogVisible" :before-close="beforeClose">
 			<onmyoji-active-item :activeId="curActiveId"></onmyoji-active-item>
 		</cl-dialog>
 	</div>
@@ -327,11 +298,6 @@ async function refresh(params?: any) {
 			prop: `prop${item.activeItemId}`,
 			minWidth: 200
 		});
-	});
-	cur_columns.push({
-		type: "op",
-		width: 80,
-		buttons: ["edit"]
 	});
 
 	if (Table.value) {
