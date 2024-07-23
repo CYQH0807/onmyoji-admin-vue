@@ -2,7 +2,8 @@
 	<div
 		class="cl-editor-monaco"
 		:class="{
-			disabled
+			disabled,
+			border
 		}"
 		:ref="setRefs('editor')"
 		:style="{ height: parsePx(height) }"
@@ -19,7 +20,6 @@ import "../utils/worker";
 import "../utils/theme";
 import "../utils/config";
 import { useFormat } from "../utils/format";
-import { useTypes } from "../utils/types";
 
 const props = defineProps({
 	modelValue: null,
@@ -40,14 +40,17 @@ const props = defineProps({
 		type: String,
 		default: "json"
 	},
-	disabled: Boolean
+	disabled: Boolean,
+	border: {
+		type: Boolean,
+		default: true
+	}
 });
 
 const emit = defineEmits(["update:modelValue", "change"]);
 
 const { refs, setRefs } = useCool();
 const format = useFormat();
-const types = useTypes();
 
 // 高度
 const height = ref(props.height);
@@ -96,6 +99,11 @@ function appendContent(text: string = "") {
 		});
 		editor?.focus();
 	}
+}
+
+// 滚动行
+function revealLine(val: number) {
+	editor?.revealLine(val);
 }
 
 // 格式化内容
@@ -159,9 +167,6 @@ function create() {
 				formatCode();
 			}
 		}, 300);
-
-		// 代码描述
-		types.loadDeclares();
 	});
 }
 
@@ -190,14 +195,22 @@ defineExpose({
 	editor,
 	setContent,
 	appendContent,
-	formatCode
+	formatCode,
+	revealLine
 });
 </script>
 
 <style lang="scss" scoped>
 .cl-editor-monaco {
-	border: 1px solid var(--el-border-color);
 	box-sizing: border-box;
 	min-height: 100px;
+
+	:deep(.monaco-editor) {
+		outline-width: 0;
+	}
+
+	&.border {
+		border: 1px solid var(--el-border-color);
+	}
 }
 </style>

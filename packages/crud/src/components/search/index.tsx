@@ -96,6 +96,7 @@ export default defineComponent({
 
 		// 重置
 		function reset() {
+			console.log('reset: ');
 			const d: any = {};
 
 			config.items?.map((e) => {

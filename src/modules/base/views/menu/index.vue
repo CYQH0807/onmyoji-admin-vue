@@ -179,7 +179,7 @@ const Table = useTable({
 		{
 			prop: "router",
 			label: "节点路由",
-			minWidth: 160
+			minWidth: 170
 		},
 		{
 			prop: "keepAlive",
@@ -262,7 +262,7 @@ const Upsert = useUpsert({
 			label: "上级节点",
 			hook: {
 				submit(value) {
-					return value === "" ? null : value;
+					return value || null;
 				}
 			},
 			component: {

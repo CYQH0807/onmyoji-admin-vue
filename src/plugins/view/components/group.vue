@@ -24,6 +24,20 @@
 							</el-tooltip>
 						</div>
 
+						<div class="search" v-if="config.enableKeySearch">
+							<el-input
+								placeholder="搜索关键字"
+								v-model="keyWord"
+								clearable
+								:prefix-icon="Search"
+								@change="
+									refresh({
+										page: 1
+									})
+								"
+							/>
+						</div>
+
 						<div class="data" v-loading="loading">
 							<el-scrollbar>
 								<!-- 树类型 -->
@@ -148,7 +162,8 @@ import {
 	ArrowRight,
 	ArrowRightBold,
 	Refresh as IconRefresh,
-	Plus
+	Plus,
+	Search
 } from "@element-plus/icons-vue";
 import { useBrowser, useCool } from "/@/cool";
 import { ContextMenu, useForm } from "@cool-vue/crud";
@@ -173,6 +188,7 @@ const config = reactive(
 			service: {},
 			enableContextMenu: true,
 			enableRefresh: true,
+			enableKeySearch: true,
 			enableAdd: true,
 			custom: false
 		},
@@ -189,6 +205,9 @@ if (isEmpty(config.service) && !isCustom) {
 
 // 加载中
 const loading = ref(false);
+
+// 搜索关键字
+const keyWord = ref("");
 
 // 列表
 const list = ref<ClViewGroup.Item[]>([]);
@@ -258,10 +277,9 @@ function edit(item?: ClViewGroup.Item) {
 
 						if (item) {
 							Object.assign(item, data);
-						} else {
-							refresh();
 						}
 
+						refresh();
 						close();
 					})
 					.catch((err) => {
@@ -280,24 +298,31 @@ function remove(item: ClViewGroup.Item) {
 		type: "warning"
 	})
 		.then(() => {
-			config.service
-				.delete({
-					ids: [item.id]
-				})
-				.then(async () => {
-					ElMessage.success("删除成功");
+			function next(params: any) {
+				config.service
+					.delete(params)
+					.then(async () => {
+						ElMessage.success("删除成功");
 
-					// 刷新列表
-					await refresh();
+						// 刷新列表
+						await refresh();
 
-					// 删除当前
-					if (selected.value?.id == item.id) {
-						select();
-					}
-				})
-				.catch((err) => {
-					ElMessage.error(err.message);
-				});
+						// 删除当前
+						if (selected.value?.id == item.id) {
+							select();
+						}
+					})
+					.catch((err) => {
+						ElMessage.error(err.message);
+					});
+			}
+
+			// 删除事件
+			if (config.onDelete) {
+				config.onDelete(item, { next });
+			} else {
+				next({ ids: [item.id] });
+			}
 		})
 		.catch(() => null);
 }
@@ -325,10 +350,11 @@ async function refresh(params?: any) {
 
 	const data = {
 		...reqParams,
-		...config.data
+		...config.data,
+		keyWord: keyWord.value
 	};
 
-	let req;
+	let req: Promise<void>;
 
 	if (tree.visible) {
 		// 树形数据
@@ -472,6 +498,8 @@ defineExpose({
 		}
 
 		.scope {
+			display: flex;
+			flex-direction: column;
 			height: 100%;
 			width: 100%;
 			box-sizing: border-box;
@@ -503,8 +531,14 @@ defineExpose({
 				}
 			}
 
+			.search {
+				height: 40px;
+				padding: 0 10px;
+			}
+
 			.data {
-				height: calc(100% - 40px);
+				flex: 1;
+				overflow: hidden;
 				box-sizing: border-box;
 
 				:deep(.el-tree-node__content) {

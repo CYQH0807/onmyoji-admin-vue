@@ -23,6 +23,8 @@ export declare interface EpsModule {
 	prefix: string;
 	router: string;
 	module: string;
+	fieldEq?: string[];
+	keyWordLikeFields?: string[];
 	[key: string]: any;
 }
 
@@ -30,7 +32,12 @@ export declare interface EpsData {
 	[key: string]: EpsModule[];
 }
 
-export declare type CodeType = "entity" | "controller" | "vue";
+export interface CodeItem {
+	label: string;
+	value: string;
+	content: string;
+	[key: string]: any;
+}
 
 export declare interface PropRule {
 	value?: string;

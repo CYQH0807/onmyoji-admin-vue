@@ -1,0 +1,1 @@
+import"./index-BzwtatPw.js";import"./store-BGvsPsWR.js";import{a as e}from"./index-OBXFyj3D.js";import{r as i}from"./@vue.reactivity-V6IlnEmz.js";import{E as p}from"./@vue.runtime-core-B2X3lOUZ.js";function f(r){const o=i();return e("cl-view-group",o),r&&p("useViewGroup__options",r),{ViewGroup:o}}export{f as u};

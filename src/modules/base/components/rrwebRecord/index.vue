@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { record } from "rrweb";
-import { getRecordConsolePlugin } from "@saola.ai/rrweb-plugin-console-record";
+import { getRecordConsolePlugin } from "@rrweb/rrweb-plugin-console-record";
 
 const recordFlag = ref(false);
 const btnText = computed(() => {

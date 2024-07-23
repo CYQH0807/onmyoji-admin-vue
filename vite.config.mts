@@ -5,7 +5,8 @@ import vueJsx from "@vitejs/plugin-vue-jsx";
 import compression from "vite-plugin-compression";
 import { visualizer } from "rollup-plugin-visualizer";
 import { proxy } from "./src/config/proxy";
-import { cool } from "./build/cool";
+import { cool } from "@cool-vue/vite-plugin";
+import { constants } from "crypto";
 
 function resolve(dir: string) {
 	return path.resolve(__dirname, ".", dir);
@@ -51,7 +52,10 @@ export default ({ mode }: ConfigEnv): UserConfig => {
 			vue(),
 			compression(),
 			vueJsx(),
-			cool(false), // 是否测试模式
+			cool({
+				type: "admin",
+				proxy
+			}),
 			visualizer({
 				open: false,
 				gzipSize: true,
@@ -97,31 +101,35 @@ export default ({ mode }: ConfigEnv): UserConfig => {
 		esbuild: {
 			drop: isDev(mode) ? [] : ["console", "debugger"]
 		},
-		build: isLib(mode)
-			? libBuild
-			: {
-					minify: "esbuild",
-					sourcemap: isDev(mode),
-					rollupOptions: {
-						output: {
-							chunkFileNames: "static/js/[name]-[hash].js",
-							entryFileNames: "static/js/[name]-[hash].js",
-							assetFileNames: "static/[ext]/[name]-[hash].[ext]",
-							manualChunks(id) {
-								if (id.includes("node_modules")) {
-									if (!["@cool-vue/crud"].find((e) => id.includes(e))) {
-										let str = id.toString().split("node_modules/")[1];
-
-										if (str[0] == "@") {
-											str = str.replace("/", ".");
-										}
-
-										return str.split("/")[0].toString();
-									}
+		build: {
+			minify: "esbuild",
+			// terserOptions: {
+			// 	compress: {
+			// 		drop_console: true,
+			// 		drop_debugger: true
+			// 	}
+			// },
+			sourcemap: isDev(mode),
+			rollupOptions: {
+				output: {
+					chunkFileNames: "static/js/[name]-[hash].js",
+					entryFileNames: "static/js/[name]-[hash].js",
+					assetFileNames: "static/[ext]/[name]-[hash].[ext]",
+					manualChunks(id) {
+						if (id.includes("node_modules")) {
+							if (!["@cool-vue/crud"].find((e) => id.includes(e))) {
+								if (id.includes("prettier")) {
+									return;
 								}
+
+								return id.toString().split("node_modules/")[1].replace(".pnpm/", "").split("/")[0];
+							} else {
+								return "comm";
 							}
 						}
 					}
 				}
+			}
+		}
 	};
 };

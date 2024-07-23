@@ -6,6 +6,9 @@
 			<template #right>
 				<cl-crud ref="Crud">
 					<cl-row>
+						<cl-search resetBtn ref="Search" />
+					</cl-row>
+					<cl-row>
 						<!-- 刷新按钮 -->
 						<cl-refresh-btn />
 
@@ -56,7 +59,7 @@
 </template>
 
 <script lang="ts" name="dict-list" setup>
-import { setFocus, useCrud, useTable, useUpsert, useForm } from "@cool-vue/crud";
+import { setFocus, useCrud, useTable, useUpsert, useSearch } from "@cool-vue/crud";
 import onmyojiActiveItem from "./activeItem.vue";
 import { useCool } from "/@/cool";
 import { Ref, computed, ref } from "vue";
@@ -134,6 +137,18 @@ const { ViewGroup } = useViewGroup({
 			]
 		};
 	}
+});
+
+const Search = useSearch({
+	items: [
+		{
+			label: "提出单位",
+			prop: "a1",
+			component: {
+				name: "el-input"
+			}
+		}
+	]
 });
 
 // cl-upsert

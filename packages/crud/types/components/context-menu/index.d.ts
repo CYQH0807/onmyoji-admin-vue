@@ -1,8 +1,9 @@
 /// <reference types="../index" />
+import { type PropType } from "vue";
 declare const ClContextMenu: import("vue").DefineComponent<{
     show: BooleanConstructor;
     options: {
-        type: ObjectConstructor;
+        type: PropType<ClContextMenu.Options>;
         default: () => {};
     };
     event: {
@@ -12,7 +13,7 @@ declare const ClContextMenu: import("vue").DefineComponent<{
 }, () => any, unknown, {}, {}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, {}, string, import("vue").PublicProps, Readonly<import("vue").ExtractPropTypes<{
     show: BooleanConstructor;
     options: {
-        type: ObjectConstructor;
+        type: PropType<ClContextMenu.Options>;
         default: () => {};
     };
     event: {
@@ -20,11 +21,11 @@ declare const ClContextMenu: import("vue").DefineComponent<{
         default: () => {};
     };
 }>>, {
-    options: Record<string, any>;
+    options: ClContextMenu.Options;
     show: boolean;
     event: Record<string, any>;
 }, {}>;
 export declare const ContextMenu: {
-    open(event: any, options: ClContextMenu.Options): void;
+    open(event: any, options: ClContextMenu.Options): ClContextMenu.Exposed;
 };
 export default ClContextMenu;

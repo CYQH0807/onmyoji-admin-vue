@@ -176,7 +176,14 @@ export function useCode() {
 	}
 
 	// 创建 vue 代码
-	function createVue({ router = "", columns = [], prefix = "", api = [] }: EpsModule) {
+	function createVue({
+		router = "",
+		columns = [],
+		prefix = "",
+		api = [],
+		fieldEq = [],
+		keyWordLikeFields = []
+	}: EpsModule) {
 		// 新增、编辑
 		const upsert = {
 			items: [] as DeepPartial<ClForm.Item>[]
@@ -282,57 +289,99 @@ export function useCode() {
 			});
 		}
 
+		// 筛选
+		const clFilter = fieldEq
+			.map((field) => {
+				const item = table.columns.find((e) => e.prop == field);
+
+				if (item) {
+					if (!item.dict) {
+						item.dict = [];
+					}
+
+					if (item.component?.name == "cl-switch") {
+						item.dict = [
+							{ label: "是", value: 1 },
+							{ label: "否", value: 0 }
+						];
+					}
+
+					return `<!-- 筛选${item.label} -->\n<cl-filter label="${
+						item.label
+					}">\n<cl-select prop="${field}" :options='${toCodeString(
+						item.dict
+					)}' />\n</cl-filter>`;
+				} else {
+					return "";
+				}
+			})
+			.join("\n");
+
+		// 关键字搜索
+		const clSearchKeyPlaceholder = keyWordLikeFields
+			.map((field) => {
+				return table.columns.find((e) => e.prop == field)?.label;
+			})
+			.filter((e) => !!e)
+			.join("、");
+
 		// 代码模板
 		return `<template>
-            <cl-crud ref="Crud">
-                <cl-row>
-                    <!-- 刷新按钮 -->
-                    <cl-refresh-btn />
-                    ${perms.add ? "<!-- 新增按钮 -->\n<cl-add-btn />" : ""}
-                    ${perms.del ? "<!-- 删除按钮 -->\n<cl-multi-delete-btn />" : ""}
-                    <cl-flex1 />
-                    <!-- 关键字搜索 -->
-                    <cl-search-key />
-                </cl-row>
-        
-                <cl-row>
-                    <!-- 数据表格 -->
-                    <cl-table ref="Table" />
-                </cl-row>
-        
-                <cl-row>
-                    <cl-flex1 />
-                    <!-- 分页控件 -->
-                    <cl-pagination />
-                </cl-row>
-        
-                <!-- 新增、编辑 -->
-                <cl-upsert ref="Upsert" />
-            </cl-crud>
-        </template>
-        
-        <script lang="ts" name="${router.replace(/^\//, "").replace(/\//g, "-")}" setup>
-        import { useCrud, useTable, useUpsert } from "@cool-vue/crud";
-        import { useCool } from "/@/cool";
-        
-        const { service } = useCool();
-        
-        // cl-upsert
-        const Upsert = useUpsert(${toCodeString(upsert)});
-        
-        // cl-table
-        const Table = useTable(${toCodeString(table)});
-        
-        // cl-crud
-        const Crud = useCrud(
-            {
-                service: ${service.join(".")}
-            },
-            (app) => {
-                app.refresh();
-            }
-        );
-        </script>`;
+	<cl-crud ref="Crud">
+		<cl-row>
+			<!-- 刷新按钮 -->
+			<cl-refresh-btn />
+			${perms.add ? "<!-- 新增按钮 -->\n			<cl-add-btn />" : ""}
+			${perms.del ? "<!-- 删除按钮 -->\n			<cl-multi-delete-btn />" : ""}
+			${clFilter}
+			<cl-flex1 />
+			<!-- 关键字搜索 -->
+			<cl-search-key placeholder="搜索${clSearchKeyPlaceholder || "关键字"}" />
+		</cl-row>
+
+		<cl-row>
+			<!-- 数据表格 -->
+			<cl-table ref="Table" />
+		</cl-row>
+
+		<cl-row>
+			<cl-flex1 />
+			<!-- 分页控件 -->
+			<cl-pagination />
+		</cl-row>
+
+		<!-- 新增、编辑 -->
+		<cl-upsert ref="Upsert" />
+	</cl-crud>
+</template>
+
+<script lang="ts" name="${router.replace(/^\//, "").replace(/\//g, "-")}" setup>
+import { useCrud, useTable, useUpsert } from "@cool-vue/crud";
+import { useCool } from "/@/cool";
+
+const { service } = useCool();
+
+// cl-upsert
+const Upsert = useUpsert(${toCodeString(upsert)});
+
+// cl-table
+const Table = useTable(${toCodeString(table)});
+
+// cl-crud
+const Crud = useCrud(
+	{
+		service: ${service.join(".")}
+	},
+	(app) => {
+		app.refresh();
+	}
+);
+
+// 刷新
+function refresh(params?: any) {
+	Crud.value?.refresh(params);
+}
+</script>`;
 	}
 
 	// 转成代码字符串

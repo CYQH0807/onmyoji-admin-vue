@@ -20,6 +20,10 @@
 
 -   [🌐 码云仓库地址](https://gitee.com/cool-team-official/cool-admin-vue)
 
+## 视频教程
+
+[官方 B 站视频教程](https://www.bilibili.com/video/BV1j1421R7aB)
+
 ## 演示
 
 [https://show.cool-admin.com](https://show.cool-admin.com)
@@ -38,10 +42,10 @@
 
 ## 安装项目依赖
 
-推荐使用 `yarn`：
+推荐使用 `pnpm`：
 
 ```shell
-yarn
+pnpm i
 ```
 
 ## 运行应用程序
@@ -49,7 +53,7 @@ yarn
 安装过程完成后，运行以下命令启动服务。您可以在浏览器中预览网站 [http://localhost:9000](http://localhost:9000)
 
 ```shell
-yarn dev
+pnpm dev
 ```
 
 ### 低价服务器

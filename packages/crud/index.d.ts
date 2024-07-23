@@ -40,8 +40,8 @@ declare type obj = {
 declare type DeepPartial<T> = T extends Function
 	? T
 	: T extends object
-		? { [P in keyof T]?: DeepPartial<T[P]> }
-		: T;
+	  ? { [P in keyof T]?: DeepPartial<T[P]> }
+	  : T;
 
 // 合并
 declare type Merge<A, B> = Omit<A, keyof B> & B;
@@ -575,6 +575,7 @@ declare namespace ClForm {
 		showLoading(): void;
 		hideLoading(): void;
 		setDisabled(flag?: boolean): void;
+		invokeData(data: any): void;
 		setData(prop: string, value: any): void;
 		bindForm(data: obj): void;
 		getForm(prop?: string): any;
@@ -692,17 +693,22 @@ declare namespace ClContextMenu {
 	}
 
 	interface Options {
+		class?: string;
 		hover?:
 			| boolean
 			| {
 					target?: string;
 					className?: string;
 			  };
-		list: Item[];
+		list?: Item[];
 	}
 
 	interface Ref {
-		open(event: Event, options: Options): Ref;
+		open(event: Event, options: Options): Exposed;
+		close(): void;
+	}
+
+	interface Exposed {
 		close(): void;
 	}
 }
@@ -737,9 +743,10 @@ declare interface Config {
 			autoHeight: boolean;
 			contextMenu: ClTable.ContextMenu;
 			column: {
-				minWidth: number;
+				minWidth: number | string;
 				align: ElementPlus.Align;
 				headerAlign: ElementPlus.Align;
+				opWidth: number | string;
 			};
 			plugins: ClTable.Plugin[];
 		};

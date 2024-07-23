@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { getReplayConsolePlugin } from "@saola.ai/rrweb-plugin-console-replay";
+import { getReplayConsolePlugin } from "@rrweb/rrweb-plugin-console-replay";
 import rrwebPlayer from "rrweb-player";
 import "rrweb-player/dist/style.css";
 let events = [];

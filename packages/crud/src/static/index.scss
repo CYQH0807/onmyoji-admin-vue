@@ -38,8 +38,8 @@
 	&__select {
 		margin-right: 10px;
 
-		.el-input__inner {
-			width: 60px;
+		&.el-select {
+			width: 100px;
 		}
 	}
 
@@ -333,10 +333,12 @@
 	}
 
 	&:not(.el-form--label-top) {
-		&.no-label {
-			& > .el-form-item__label {
-				padding: 0;
-				display: none;
+		.el-form-item {
+			&.no-label {
+				& > .el-form-item__label {
+					padding: 0;
+					display: none;
+				}
 			}
 		}
 	}
@@ -506,10 +508,10 @@
 }
 
 .cl-dialog {
-	display: flex;
-	flex-direction: column;
-	border-radius: 6px;
-	padding: 0;
+	&.el-dialog {
+		border-radius: 6px;
+		padding: 0;
+	}
 
 	.el-dialog {
 		&__header {

@@ -1,4 +1,14 @@
-import { defineComponent, nextTick, onMounted, reactive, ref, h, render, toRaw } from "vue";
+import {
+	defineComponent,
+	nextTick,
+	onMounted,
+	reactive,
+	ref,
+	h,
+	render,
+	toRaw,
+	type PropType
+} from "vue";
 import { isString } from "lodash-es";
 import { addClass, contains, removeClass } from "../../utils";
 import { useRefs } from "../../hooks";
@@ -11,16 +21,12 @@ const ClContextMenu = defineComponent({
 	props: {
 		show: Boolean,
 		options: {
-			type: Object,
-			default: () => {
-				return {};
-			}
+			type: Object as PropType<ClContextMenu.Options>,
+			default: () => ({})
 		},
 		event: {
 			type: Object,
-			default: () => {
-				return {};
-			}
+			default: () => ({})
 		}
 	},
 
@@ -43,7 +49,7 @@ const ClContextMenu = defineComponent({
 		const ids = ref("");
 
 		// 阻止默认事件
-		function stopDefault(e: MouseEvent) {
+		function stopDefault(e: any) {
 			if (e.preventDefault) {
 				e.preventDefault();
 			}
@@ -71,44 +77,20 @@ const ClContextMenu = defineComponent({
 		}
 
 		// 目标元素
-		let targetEl: any = null;
+		let targetEl: any;
 
 		// 关闭
 		function close() {
 			visible.value = false;
 			ids.value = "";
-			removeClass(targetEl, "cl-context-menu__target");
+
+			if (targetEl) {
+				removeClass(targetEl, "cl-context-menu__target");
+			}
 		}
 
 		// 打开
-		function open(event: any, options?: any) {
-			let left = event.pageX;
-			let top = event.pageY;
-
-			if (!options) {
-				options = {};
-			}
-
-			// 点击样式
-			if (options.hover) {
-				const d = options.hover === true ? {} : options.hover;
-				targetEl = event.target;
-
-				if (targetEl && isString(targetEl.className)) {
-					if (d.target) {
-						while (!targetEl.className.includes(d.target)) {
-							targetEl = targetEl.parentNode;
-						}
-					}
-
-					addClass(targetEl, d.className || "cl-context-menu__target");
-				}
-			}
-
-			if (options.list) {
-				list.value = parseList(options.list);
-			}
-
+		function open(event: any, options: ClContextMenu.Options = {}) {
 			// 阻止默认事件
 			stopDefault(event);
 
@@ -116,9 +98,20 @@ const ClContextMenu = defineComponent({
 			visible.value = true;
 
 			nextTick(() => {
-				const { clientHeight: h1, clientWidth: w1 } = event.target.ownerDocument.body;
-				const { clientHeight: h2, clientWidth: w2 } =
-					refs["context-menu"].querySelector(".cl-context-menu__box");
+				const el = refs["context-menu"].querySelector(".cl-context-menu__box");
+
+				// 计算位置
+				let left = event.pageX;
+				let top = event.pageY;
+
+				// 组件方式用 offset 计算
+				if (!props.show) {
+					left = event.offsetX;
+					top = event.offsetY;
+				}
+
+				const { clientHeight: h1, clientWidth: w1 } = event.target?.ownerDocument.body;
+				const { clientHeight: h2, clientWidth: w2 } = el;
 
 				if (top + h2 > h1) {
 					top = h1 - h2 - 5;
@@ -130,6 +123,32 @@ const ClContextMenu = defineComponent({
 
 				style.left = left + "px";
 				style.top = top + "px";
+
+				// 点击样式
+				if (options?.hover) {
+					const d = options.hover === true ? {} : options.hover;
+					targetEl = event.target;
+
+					if (targetEl && isString(targetEl.className)) {
+						if (d.target) {
+							while (!targetEl.className.includes(d.target)) {
+								targetEl = targetEl.parentNode;
+							}
+						}
+
+						addClass(targetEl, d.className || "cl-context-menu__target");
+					}
+				}
+
+				// 自定义样式
+				if (options?.class) {
+					addClass(el, options.class);
+				}
+
+				// 菜单列表
+				if (options?.list) {
+					list.value = parseList(options.list);
+				}
 			});
 
 			return {
@@ -176,7 +195,7 @@ const ClContextMenu = defineComponent({
 				});
 
 				// 默认打开
-				open(props.event, props.options);
+				open(props.event, props?.options);
 			}
 		});
 
@@ -245,13 +264,15 @@ const ClContextMenu = defineComponent({
 
 export const ContextMenu = {
 	open(event: any, options: ClContextMenu.Options) {
-		const vm: any = h(ClContextMenu, {
+		const vm = h(ClContextMenu, {
 			show: true,
 			event,
 			options
 		});
 
 		render(vm, event.target.ownerDocument.createElement("div"));
+
+		return vm.component?.exposed as ClContextMenu.Exposed;
 	}
 };
 

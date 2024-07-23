@@ -4,13 +4,13 @@ import { getRules } from "./utils";
 export default (): ModuleConfig => {
 	return {
 		options: {
-			host: "https://service.cool-js.com"
+			host: "https://service.cool-js.com/api"
 		},
 		toolbar: {
 			order: 1,
 			component: import("./components/auto-menu/btn.vue")
 		},
-		views: [
+		pages: [
 			{
 				path: "/helper/ai-code",
 				meta: {

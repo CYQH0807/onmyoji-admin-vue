@@ -23,10 +23,8 @@ const chartOption = reactive({
 		left: "center",
 		data: ["手机", "相机", "耳机", "音箱", "手表"]
 	},
-	color: ["#3AA1FF", "#36CBCB", "#F2637B", "#975FE5", "#FBD437"],
 	series: [
 		{
-			name: "访问来源",
 			type: "pie",
 			radius: ["50%", "60%"],
 			center: ["50%", "40%"],

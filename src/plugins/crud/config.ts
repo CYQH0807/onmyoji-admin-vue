@@ -13,8 +13,8 @@ export default (): Merge<ModuleConfig, CrudOptions> => {
 		label: "CRUD",
 		description: "快速增删改查及一系列辅助组件",
 		author: "COOL",
-		version: "1.0.5",
-		updateTime: "2024-02-28",
+		version: "1.0.7",
+		updateTime: "2024-05-26",
 		demo: "/demo/crud",
 
 		// 组件全注册
@@ -26,7 +26,9 @@ export default (): Merge<ModuleConfig, CrudOptions> => {
 				table: {
 					// 插件列表
 					plugins: []
-					// contextMenu: [], 是否关闭表格右键菜单
+
+					// 右键菜单，为空则关闭
+					// contextMenu: []
 				},
 				form: {
 					// 插件列表

@@ -4,7 +4,7 @@ import { useBase } from "../../base";
 import { Socket, io } from "socket.io-client";
 import { ElMessage } from "element-plus";
 
-import { useMitt } from "/@/cool/hook/mitt";
+import { useMitt } from "/@/cool/hooks/mitt";
 
 export const useSocketStore = defineStore("chat-socket", () => {
 	const mitt = useMitt();
